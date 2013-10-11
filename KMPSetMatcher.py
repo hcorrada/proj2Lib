@@ -1,7 +1,7 @@
 from proj2Lib.KMPMatcher import KMPMatcher as KMPMatcher
 
 # UPDATE THIS CLASS TO IMPLEMENT SET MATCHING WITH THE KMP ALGORITHM
-class NaiveSetMatcher(object):
+class KMPSetMatcher(object):
 	def __init__(self, patterns):
 		pass
 
