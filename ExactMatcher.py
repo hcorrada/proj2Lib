@@ -44,7 +44,7 @@ class ExactMatcherNode(object):
 	def getChild(self, index):
 		if self.isLeaf():
 			return None
-		c = self.getChildLabels()[0]
+		c = self.getChildLabels()[index]
 		return self.children[c]
 
 	# is this a leaf?
