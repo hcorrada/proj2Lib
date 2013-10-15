@@ -98,7 +98,14 @@ class ExactMatcher(object):
 
 		# start in the first position of the target
 		i = 0  
-		while i < len(target):
+		while i <= len(target):
+			# check if this is a leaf (pattern is exhausted)
+			if currentNode.isLeaf():
+				self.reportMatch(i)
+			
+			if i == len(target):
+				break
+
 			c = target[i]
 #			print 'i:', i, c
 
@@ -106,10 +113,7 @@ class ExactMatcher(object):
 
 			# get the current target character
 
-			# check if this is a leaf (pattern is exhausted)
-			if currentNode.isLeaf():
-				self.reportMatch(i)
-
+		
 			# try to matching it to an exiting edge on the current node
 			# if current node is a leaf, this function updates correctly
 			(currentNode, targetShift) = currentNode.getTransition(c)
