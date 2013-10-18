@@ -8,8 +8,28 @@ class ACSetMatcherNode(ExactMatcherNode):
 		super(ACSetMatcherNode, self).__init__(root)
 		self.output = -1
 
-	def isOutput(self):
-		return not self.output < 0
+	def checkOutput(self, position, reportFormat):
+		currentNode = self
+		if not currentNode.output < 0:
+			print reportFormat.format(position - self.depth, self.output)
+
+		while not currentNode.isRoot():
+			currentNode = currentNode.failureLink
+			if not currentNode.output < 0:
+				print reportFormat.format(position - currentNode.depth, currentNode.output)
+
+
+
+	def getOutput(self):
+		if not self.output < 0:
+			return self.output
+
+		currentNode = self.failureLink
+		while not currentNode.isRoot():
+			if not currentNode.output < 0:
+				return currentNode.output
+			currentNode = currentNode.failureLink
+		return currentNode.output
 
 class ACSetMatcher(ExactMatcher):
 	def __init__(self, patterns, reportFormat='Found match of pattern {1} in position {0}'):
@@ -83,11 +103,13 @@ class ACSetMatcher(ExactMatcher):
 
 		# start in the first position of the target
 		i = 0  
+		fromMismatch = False
 		while i <= len(target):
-			# check if this is an output node
-			if currentNode.isOutput():
-				self.reportMatch(i, currentNode.output)
-			
+			# check if we need to output here
+			if not fromMismatch:
+				currentNode.checkOutput(i, self.reportFormat)
+			fromMismatch = False
+
 			if i == len(target):
 				break
 
@@ -100,7 +122,8 @@ class ACSetMatcher(ExactMatcher):
 
 		
 			# try to matching it to an exiting edge on the current node
-			# if current node is a leaf, this function updates correctly
+			# here we use isMatch first to avoid double reporting of matches
+			fromMismatch = not currentNode.isMatch(c)
 			(currentNode, targetShift) = currentNode.getTransition(c)
 
 #			print 'shift', targetShift, '\n'
