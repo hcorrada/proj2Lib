@@ -7,16 +7,16 @@ class ACSetMatcherNode(ExactMatcherNode):
 	def __init__(self, root=False):
 		super(ACSetMatcherNode, self).__init__(root)
 		self.output = -1
+		self.outputLink = None
 
 	def checkOutput(self, position, reportFormat):
 		currentNode = self
 		if not currentNode.output < 0:
 			print reportFormat.format(position - self.depth, self.output)
 
-		while not currentNode.isRoot():
-			currentNode = currentNode.failureLink
-			if not currentNode.output < 0:
-				print reportFormat.format(position - currentNode.depth, currentNode.output)
+		while not currentNode.outputLink is None and not currentNode.isRoot():
+			currentNode = currentNode.outputLink
+			print reportFormat.format(position - currentNode.depth, currentNode.output)
 
 
 
@@ -70,16 +70,17 @@ class ACSetMatcher(ExactMatcher):
 		
 		# this function determines the failure link of child of 'node' with edge labeled 'x'
 		if node.isRoot():
-			return self.root
+			return self.root, None
 
 		w = node.failureLink
 		while not w.isMatch(x) and not w.isRoot():
 			w = w.failureLink
 		if w.isMatch(x):
 			failNode, _ = w.getTransition(x)
-			return failNode
+			outputLink = failNode if not failNode.output < 0 else failNode.outputLink
+			return failNode, outputLink
 		else:
-			return self.root
+			return self.root, None
 
 	def preprocessPatterns(self, patterns):
 		# use findFailureLink here to construct complete keyword tree for
@@ -91,8 +92,9 @@ class ACSetMatcher(ExactMatcher):
 		while len(d) > 0:
 			currentNode = d.popleft()
 			for (x, child) in currentNode.children.iteritems():
-				failNode = self.findFailureLink(currentNode, x)
+				failNode, outputLink = self.findFailureLink(currentNode, x)
 				child.setFailureLink(failNode)
+				child.outputLink = outputLink
 				d.append(child)
 
 	def matchTarget(self, target):
