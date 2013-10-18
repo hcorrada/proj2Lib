@@ -18,19 +18,6 @@ class ACSetMatcherNode(ExactMatcherNode):
 			currentNode = currentNode.outputLink
 			print reportFormat.format(position - currentNode.depth, currentNode.output)
 
-
-
-	def getOutput(self):
-		if not self.output < 0:
-			return self.output
-
-		currentNode = self.failureLink
-		while not currentNode.isRoot():
-			if not currentNode.output < 0:
-				return currentNode.output
-			currentNode = currentNode.failureLink
-		return currentNode.output
-
 class ACSetMatcher(ExactMatcher):
 	def __init__(self, patterns, reportFormat='Found match of pattern {1} in position {0}'):
 		self.root = ACSetMatcherNode(root=True)
