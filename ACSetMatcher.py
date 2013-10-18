@@ -1,5 +1,6 @@
 from proj2Lib.ExactMatcher import ExactMatcher 
 from proj2Lib.ExactMatcher import ExactMatcherNode
+from collections import deque
 
 # UPDATE THIS FILE TO IMPLEMENT THE AHO-CORASICK ALGORITHM
 class ACSetMatcher(ExactMatcher):
@@ -25,7 +26,7 @@ class ACSetMatcher(ExactMatcher):
 				else:
 					newNode = ExactMatcherNode()
 					newNode.setFailureLink(self.root)
-					newNode.targetShift = currentNode.targetShift - 1
+					newNode.targetShift = 0
 					currentNode.setChild(x, newNode)
 					currentNode = newNode
 
@@ -33,13 +34,33 @@ class ACSetMatcher(ExactMatcher):
 		# implement algorithm of section 3.4.5
 		# consult KMPMatcher to see how it uses the automata representation 
 		# in that case
-		pass
+		
+		# this function determines the failure link of child of 'node' with edge labeled 'x'
+		if node.isRoot():
+			return self.root
+
+		w = node.failureLink
+		while not w.isMatch(x) and not w.isRoot():
+			w = w.failureLink
+		if w.isMatch(x):
+			failNode, _ = w.getTransition(x)
+			return failNode
+		else:
+			return self.root
 
 	def preprocessPatterns(self, patterns):
 		# use findFailureLink here to construct complete keyword tree for
 		# pattern set
 		self.buildKeywordTree(patterns)
 
+		# now let's build the failure links
+		d = deque([self.root])
+		while len(d) > 0:
+			currentNode = d.popleft()
+			for (x, child) in currentNode.children.iteritems():
+				failNode = self.findFailureLink(currentNode, x)
+				child.setFailureLink(failNode)
+				d.append(child)
 
 	# def matchTarget(self, target):
 	# 	# For testing purposes, note that this method as defined by ExactMatcher
