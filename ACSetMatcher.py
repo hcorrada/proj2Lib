@@ -1,5 +1,5 @@
-from proj2Lib.ExactMatcher import ExactMatcher as ExactMatcher
-from proj2Lib.ExactMatcherNode import ExactMatcherNode as ExactMatcherNode
+from proj2Lib.ExactMatcher import ExactMatcher
+from proj2Lib.ExactMatcher import ExactMatcherNode 
 
 # UPDATE THIS FILE TO IMPLEMENT THE AHO-CORASICK ALGORITHM
 class ACSetMatcher(ExactMatcher):
