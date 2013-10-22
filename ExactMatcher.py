@@ -10,6 +10,8 @@ class ExactMatcherNode(object):
 
 		self.numQueries = 0 # number of matching queries against node
 
+		self.isRoot = root # convenience property to decide if this is the root
+		
 	# pretty print node information
 	def printNode(self, full=True):
 		childrenChars = ','.join(self.children.keys())
